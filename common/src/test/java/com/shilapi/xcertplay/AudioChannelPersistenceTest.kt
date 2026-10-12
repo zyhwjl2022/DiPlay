@@ -32,6 +32,21 @@ class AudioChannelPersistenceTest {
         org.junit.Assert.assertTrue(AirPlayPersistence.loadAudioFocusAutoYield(context))
     }
 
+    @Test fun navigationDuckPercentDefaultsToTwentyAndRoundTrips() {
+        assertEquals(20, AirPlayPersistence.loadNavigationDuckPercent(context))
+        for (percent in AirPlayPersistence.NAVIGATION_DUCK_PERCENTS) {
+            AirPlayPersistence.saveNavigationDuckPercent(context, percent)
+            assertEquals(percent, AirPlayPersistence.loadNavigationDuckPercent(context))
+        }
+    }
+
+    @Test fun unsupportedNavigationDuckPercentFallsBackToTwenty() {
+        AirPlayPersistence.saveNavigationDuckPercent(context, 45)
+        assertEquals(20, AirPlayPersistence.loadNavigationDuckPercent(context))
+        prefs.edit().putInt("navigation_duck_percent", -5).apply()
+        assertEquals(20, AirPlayPersistence.loadNavigationDuckPercent(context))
+    }
+
     @Test fun legacyNavigationChannelIsInheritedWithoutChangingMedia() {
         AirPlayPersistence.saveNavigationStreamType(context, 15)
         assertEquals(15, AirPlayPersistence.loadNavigationAudioChannel(context))

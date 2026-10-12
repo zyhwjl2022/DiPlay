@@ -8,4 +8,8 @@
     <string name="contrib_audio_home_toggle_audio_focus_desc">Coordinate CarPlay sound with other car audio sources. If sound is unavailable with this enabled, turn it off. Changes apply on reconnect.</string>
     <string name="audio_focus_auto_yield">Mute media on temporary focus loss</string>
     <string name="audio_focus_auto_yield_desc">When audio focus is enabled, mute media during Android audio interruptions, including calls. Restore audio when focus returns. Disable if your head unit does not return focus. Changes apply on reconnect.</string>
+    <string name="navigation_duck_title">Music level during navigation</string>
+    <string name="navigation_duck_desc">How loud CarPlay music stays while navigation guidance plays. Lower values duck the music further; Off keeps music at full volume. Changes apply on reconnect.</string>
+    <string name="navigation_duck_off">Off (no ducking)</string>
+    <string name="navigation_duck_percent_value">%1$d%%</string>
 </resources>

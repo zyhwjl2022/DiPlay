@@ -189,6 +189,55 @@ class AudioFocusAutoYieldTest {
         assertEquals(1f, volumes(media).last())
     }
 
+    @Test fun navigationDuckVolumeDefaultsToTwentyPercentOfMedia() {
+        val coordinator = AudioFocusCoordinator(context, true, unifiedMediaOutput = true).also(coordinators::add)
+        val media = track(); val navigation = track()
+        coordinator.acquire(media, AudioChannel.MEDIA, attributes)
+        assertEquals(listOf(1f), volumes(media))
+        coordinator.acquire(navigation, AudioChannel.NAVIGATION, attributes)
+        assertEquals(0.2f, volumes(media).last())
+        assertTrue(volumes(navigation).all { it == 1f })
+    }
+
+    @Test fun configurableNavigationDuckVolumeScalesMediaAndOneHundredKeepsItFull() {
+        val coordinator = AudioFocusCoordinator(context, true, unifiedMediaOutput = true,
+            navigationDuckVolume = 0.5f).also(coordinators::add)
+        val media = track(); val navigation = track()
+        coordinator.acquire(media, AudioChannel.MEDIA, attributes)
+        coordinator.acquire(navigation, AudioChannel.NAVIGATION, attributes)
+        assertEquals(0.5f, volumes(media).last())
+        coordinator.setNavigationDuckVolume(1f)
+        assertEquals(1f, volumes(media).last())
+        coordinator.setNavigationDuckVolume(0f)
+        assertEquals(0f, volumes(media).last())
+        assertTrue(volumes(navigation).all { it == 1f })
+    }
+
+    @Test fun navigationDuckVolumeIsClampedAndIsReappliedOnMediaAcquire() {
+        val coordinator = AudioFocusCoordinator(context, true, unifiedMediaOutput = true,
+            navigationDuckVolume = 0.5f).also(coordinators::add)
+        val media = track()
+        coordinator.acquire(media, AudioChannel.MEDIA, attributes)
+        assertEquals(listOf(1f), volumes(media))
+        coordinator.setNavigationDuckVolume(2f)
+        assertEquals(1f, volumes(media).last())
+        coordinator.setNavigationDuckVolume(-1f)
+        assertEquals(1f, volumes(media).last())
+        assertTrue(volumes(media).all { it == 1f })
+    }
+
+    @Test fun navigationDuckVolumeAppliesToSpeechContentOnlyThroughTheMusicFlag() {
+        val coordinator = AudioFocusCoordinator(context, true, unifiedMediaOutput = true,
+            navigationDuckVolume = 0.3f).also(coordinators::add)
+        val speech = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build()
+        val announcement = track(); val navigation = track()
+        coordinator.acquire(announcement, AudioChannel.MEDIA, speech)
+        coordinator.acquire(navigation, AudioChannel.NAVIGATION, attributes)
+        assertEquals(1f, volumes(announcement).last())
+    }
+
     private fun coordinator(enabled: Boolean = true, autoYield: Boolean = true) =
         AudioFocusCoordinator(context, enabled, autoYield).also(coordinators::add)
     private fun track(): AudioTrack = AudioTrack.Builder().setAudioAttributes(attributes)

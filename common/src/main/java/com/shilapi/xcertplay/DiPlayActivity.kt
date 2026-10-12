@@ -5427,7 +5427,21 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             AirPlayPersistence.saveAudioFocusAutoYield(this, it)
             markReconnectNeeded()
         }
+        navigationDuckControls(dependent)
         parent.addView(dependent)
+    }
+
+    private fun navigationDuckControls(parent: LinearLayout) {
+        val percents = AirPlayPersistence.NAVIGATION_DUCK_PERCENTS
+        val options = percents.map { percent ->
+            if (percent == 100) getString(R.string.navigation_duck_off)
+            else getString(R.string.navigation_duck_percent_value, percent)
+        }
+        val current = percents.indexOf(AirPlayPersistence.loadNavigationDuckPercent(this)).coerceAtLeast(0)
+        choice(parent, getString(R.string.navigation_duck_title), options, current) { index ->
+            AirPlayPersistence.saveNavigationDuckPercent(this, percents[index])
+        }
+        parent.addView(label(getString(R.string.navigation_duck_desc), 14, MUTED))
     }
 
 

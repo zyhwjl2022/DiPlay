@@ -58,6 +58,8 @@ class AndroidMediaSink(
     private val advancedAudioChannelMapping: Boolean = false,
     private val audioFocusEnabled: Boolean = false,
     private val audioFocusAutoYield: Boolean = true,
+    /** Music level while navigation guidance plays on its own track: 1f keeps full volume, 0f mutes. */
+    private val navigationDuckVolume: Float = 0.2f,
     private val mediaChannel: Int = 0,
     private val navigationChannel: Int = 0,
     context: Context? = null,
@@ -114,6 +116,7 @@ class AndroidMediaSink(
         factoryRouting = factoryAudio != null && !bluetoothOutput,
         unifiedMediaOutput = unifiedMediaOutput,
         onOwnershipChanged = { owned -> ownsAudio = owned; audioOwnershipListener?.invoke(owned) },
+        navigationDuckVolume = navigationDuckVolume,
     )
 
     /** The media-key session may own Android's current focus request for this same sink. */

@@ -20,6 +20,11 @@ internal class AudioFocusCoordinator(
     private val factoryRouting: Boolean = false,
     private val unifiedMediaOutput: Boolean = false,
     private val onOwnershipChanged: (Boolean) -> Unit = {},
+    /**
+     * carlito | Music level while navigation guidance is on its own track. 1f disables ducking; the
+     * setting is passed by the host and may change between sessions.
+     */
+    @Volatile private var navigationDuckVolume: Float = DEFAULT_DUCKED_VOLUME,
 ) : Closeable {
     private data class Entry(val channel: AudioChannel, val attributes: AudioAttributes, var appliedVolume: Float = 1f) {
         val music = channel == AudioChannel.MEDIA && attributes.contentType != AudioAttributes.CONTENT_TYPE_SPEECH
@@ -123,6 +128,15 @@ internal class AudioFocusCoordinator(
         applyVolumes()
         runCatching { report("Audio: priority speech playing=$playing") }
         runCatching { speechListener?.invoke(playing) }
+    }
+
+    @Synchronized fun setNavigationDuckVolume(value: Float) {
+        if (closed) return
+        val clamped = value.coerceIn(0f, 1f)
+        if (navigationDuckVolume == clamped) return
+        navigationDuckVolume = clamped
+        applyVolumes()
+        runCatching { report("Audio: navigation duck volume=$clamped") }
     }
 
     @Synchronized fun onMediaPlaying(playing: Boolean) {
@@ -256,7 +270,7 @@ internal class AudioFocusCoordinator(
                 externalCall -> 0f
                 entry.music && (speechPlaying || nativeBluetoothPlaying || mediaSuppressed || mediaPlaying == false) -> 0f
                 requestedChannel in setOf(AudioChannel.PHONE, AudioChannel.ASSISTANT, AudioChannel.RINGTONE) && entry.channel != requestedChannel -> 0f
-                entry.music && navigation -> DUCKED_VOLUME
+                entry.music && navigation -> duckVolumeActive()
                 else -> 1f
             }
             runCatching { track.setVolume(focusVolume * local) }
@@ -307,5 +321,12 @@ internal class AudioFocusCoordinator(
         AudioChannel.MEDIA -> 1
         AudioChannel.NAVIGATION -> 0
     }
-    private companion object { const val DUCKED_VOLUME = 0.2f }
+    /** carlito | A saved 1f means "do not duck"; treat it as 1f rather than reading a stale constant. */
+    private fun duckVolumeActive() = navigationDuckVolume.coerceIn(0f, 1f)
+
+    private companion object {
+        const val DEFAULT_DUCKED_VOLUME = 0.2f
+        /** Kept for the legacy standard-routing path, which has no configurable navigation overlay. */
+        const val DUCKED_VOLUME = DEFAULT_DUCKED_VOLUME
+    }
 }

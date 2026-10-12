@@ -4669,6 +4669,7 @@ class CarPlayHostActivity : ComponentActivity() {
             advancedAudioChannelMapping = advancedAudioChannelMapping,
             audioFocusEnabled = AirPlayPersistence.loadAudioFocusEnabled(this),
             audioFocusAutoYield = AirPlayPersistence.loadAudioFocusAutoYield(this),
+            navigationDuckVolume = AirPlayPersistence.loadNavigationDuckPercent(this) / 100f,
             mediaChannel = AirPlayPersistence.loadMediaAudioChannel(this),
             navigationChannel = AirPlayPersistence.loadNavigationAudioChannel(this),
             navigationOutputDevice = AirPlayPersistence.loadNavigationOutputDevice(this),

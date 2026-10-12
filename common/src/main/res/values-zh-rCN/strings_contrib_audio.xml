@@ -8,4 +8,8 @@
     <string name="contrib_audio_home_toggle_audio_focus_desc">协调 CarPlay 与车机其他音源的播放。若开启后没有声音，请关闭本开关。更改在重新连接后生效。</string>
     <string name="audio_focus_auto_yield">暂时失去音频焦点时静音媒体</string>
     <string name="audio_focus_auto_yield_desc">启用音频焦点后，在 Android 音频被打断（包括来电）时静音媒体，重新获得焦点后恢复。如果车机不恢复音频焦点，请关闭此选项。更改在重新连接后生效。</string>
+    <string name="navigation_duck_title">导航播报时的音乐音量</string>
+    <string name="navigation_duck_desc">导航语音播报期间，CarPlay 音乐保留的音量。数值越小音乐被压低得越多；关闭表示导航播报时音乐不降低音量。更改在重新连接后生效。</string>
+    <string name="navigation_duck_off">关闭（不压低）</string>
+    <string name="navigation_duck_percent_value">%1$d%%</string>
 </resources>

@@ -4,6 +4,8 @@
 
 DiPlay uses one audio focus coordinator per live sink. Calls, ringtones and Siri take priority over media. Navigation overlays media at reduced volume and requests transient ducking when it is the only DiPlay output. Focus denial or loss mutes DiPlay tracks. A permanent loss does not repeatedly reclaim media focus from the newly selected native source.
 
+When navigation guidance arrives on its own track, the music level is the **Music level during navigation** setting (0, 10, 20, 30, 50, 70 or 100 percent of the original level). 100 percent, shown as *Off (no ducking)*, leaves music untouched; the default 20 percent matches the previous fixed behaviour. The setting is read when the session starts, so a change applies on reconnect. This applies only to the navigation overlay; calls, Siri and focus loss still mute media through their own paths.
+
 The default is enabled; an explicitly saved preference is retained. Standard Android focus cannot force a vendor player that ignores focus to stop.
 
 For a confirmed, bonded CarPlay peer, an available A2DP sink profile can yield Bluetooth music without disconnecting HFP, RFCOMM, the Bluetooth adapter or the pairing. Generic handoff follows granted audio ownership; factory handoff and explicit phone commands remain supported. Only an app-disconnected connection is eligible for restoration. Shared peer leases cover session replacement and a bounded retry handles an in-progress disconnect. Restricted APIs fall back to normal focus routing.

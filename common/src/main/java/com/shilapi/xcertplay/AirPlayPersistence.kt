@@ -27,6 +27,10 @@ import java.io.File
 object AirPlayPersistence {
     /** 0 uses usage-based routing; 1–20 select stream types supported by the head unit. */
     val AUDIO_CHANNELS = 0..20
+    /** Navigation ducking choices, as percent of the original music level. */
+    val NAVIGATION_DUCK_PERCENTS = listOf(0, 10, 20, 30, 50, 70, 100)
+    /** Matches the upstream constant, so an upgraded install keeps its current behaviour. */
+    const val DEFAULT_NAVIGATION_DUCK_PERCENT = 20
     private const val PREFS = "xcertplay_airplay"
     private const val KEY_IDENT_PRIVATE = "identity_private"
     private const val KEY_IDENT_PUBLIC = "identity_public"
@@ -49,6 +53,7 @@ object AirPlayPersistence {
     private const val KEY_ADVANCED_AUDIO_CHANNEL_MAPPING = "advanced_audio_channel_mapping_v2"
     private const val KEY_AUDIO_FOCUS_ENABLED = "audio_focus_enabled"
     private const val KEY_AUDIO_FOCUS_AUTO_YIELD = "audio_focus_auto_yield"
+    private const val KEY_NAVIGATION_DUCK_PERCENT = "navigation_duck_percent"
     private const val KEY_MEDIA_AUDIO_CHANNEL = "media_audio_channel"
     private const val KEY_NAVIGATION_AUDIO_CHANNEL = "navigation_audio_channel"
     private const val KEY_NAVIGATION_STREAM_TYPE = "navigation_stream_type"
@@ -244,6 +249,19 @@ object AirPlayPersistence {
     fun saveAudioFocusAutoYield(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean(KEY_AUDIO_FOCUS_AUTO_YIELD, enabled)
+            .apply()
+    }
+
+    /** Music level while navigation guidance plays: 100 means no ducking, 0 mutes music entirely. */
+    fun loadNavigationDuckPercent(context: Context): Int =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getInt(KEY_NAVIGATION_DUCK_PERCENT, DEFAULT_NAVIGATION_DUCK_PERCENT)
+            .takeIf { it in NAVIGATION_DUCK_PERCENTS } ?: DEFAULT_NAVIGATION_DUCK_PERCENT
+
+    fun saveNavigationDuckPercent(context: Context, percent: Int) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putInt(KEY_NAVIGATION_DUCK_PERCENT,
+                percent.takeIf { it in NAVIGATION_DUCK_PERCENTS } ?: DEFAULT_NAVIGATION_DUCK_PERCENT)
             .apply()
     }
 
